@@ -49,7 +49,7 @@ namespace mundoSim2
             {
                 if(Idade >= 15 && Idade <= 20) 
                 {
-                    int n = Ferramentas.GerarAleatorio(8);
+                    int n = Ferramentas.GerarAleatorio(5);
                     if(n == 5) return true;
                 }
                 else

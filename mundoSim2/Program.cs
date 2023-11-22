@@ -21,6 +21,7 @@ namespace mundoSim2
             List<Pessoa> nascidos = new List<Pessoa>();
             List<Pessoa> mortos = new List<Pessoa>();
             List<Pessoa> homens = new List<Pessoa>();
+            List<Pessoa> div1 = new List<Pessoa>();
             int qtHomens = 0;
             int qtMulheres = 0;
             List<Pessoa> mulheres = new List<Pessoa>();
@@ -72,30 +73,79 @@ namespace mundoSim2
                 Console.WriteLine("Recursos Produzidos: " + recursosProduzidos);
                 Console.Write("\n");
 
-                foreach (Pessoa pessoa in listaPessoas)
+                //separa a lista de pessoas
+                foreach(Pessoa pessoa in listaPessoas.GetRange(0, (listaPessoas.Count) / 2))
                 {
-                    //envelhecer
-                    if (pessoa.Envelhecer(pessoa) == true)
-                    {
-                        mortos.Add(pessoa);
-                        //Console.WriteLine(pessoa.Nome + " Morreu aos: " + pessoa.Idade);
-                    }
-                    //reproducão
-                    if (pessoa.Reproduzir(minFertil, maxFertil, pessoa.Genero) == true)
-                    {
-                        Pessoa novaPessoa = new Pessoa();
-                        nascidos.Add(novaPessoa);
-                        if(novaPessoa.Genero == 0)
-                        {
-                            homens.Add(novaPessoa);
-                        }
-                        else
-                        {
-                            mulheres.Add(novaPessoa);
-                        }
-                        //Console.WriteLine(novaPessoa.Nome + " Filho(ª) de " + pessoa.Nome+"|" + pessoa.Idade + " nasceu.");
-                    }
+                    div1.Add(pessoa);
+                    listaPessoas.Remove(pessoa);
                 }
+
+                var t1 = Task.Factory.StartNew(() => 
+                {
+                    foreach (Pessoa pessoa in listaPessoas)
+                    {
+                        
+                        //envelhecer
+                        if (pessoa.Envelhecer(pessoa) == true)
+                        {
+                            mortos.Add(pessoa);
+                            //Console.WriteLine(pessoa.Nome + " Morreu aos: " + pessoa.Idade);
+                        }
+                        //reproducão
+                        if (pessoa.Reproduzir(minFertil, maxFertil, pessoa.Genero) == true)
+                        {
+                            Pessoa novaPessoa = new Pessoa();
+                            nascidos.Add(novaPessoa);
+                            if (novaPessoa.Genero == 0)
+                            {
+                                homens.Add(novaPessoa);
+                            }
+                            else
+                            {
+                                mulheres.Add(novaPessoa);
+                            }
+                            //Console.WriteLine(novaPessoa.Nome + " Filho(ª) de " + pessoa.Nome+"|" + pessoa.Idade + " nasceu.");
+                        }
+                    }
+                });
+
+                var t2 = Task.Factory.StartNew(() =>
+                {
+                    foreach (Pessoa pessoa in div1)
+                    {
+                     
+                        //envelhecer
+                        if (pessoa.Envelhecer(pessoa) == true)
+                        {
+                            mortos.Add(pessoa);
+                            //Console.WriteLine(pessoa.Nome + " Morreu aos: " + pessoa.Idade);
+                        }
+                        //reproducão
+                        if (pessoa.Reproduzir(minFertil, maxFertil, pessoa.Genero) == true)
+                        {
+                            Pessoa novaPessoa = new Pessoa();
+                            nascidos.Add(novaPessoa);
+                            if (novaPessoa.Genero == 0)
+                            {
+                                homens.Add(novaPessoa);
+                            }
+                            else
+                            {
+                                mulheres.Add(novaPessoa);
+                            }
+                            //Console.WriteLine(novaPessoa.Nome + " Filho(ª) de " + pessoa.Nome+"|" + pessoa.Idade + " nasceu.");
+                        }
+                    }
+                });
+
+                Task.WaitAll(t1, t2);
+
+                //junta a lista de pessoas novamente
+                foreach (Pessoa pessoa in div1)
+                {
+                    listaPessoas.Add(pessoa);
+                }
+                div1.Clear();
 
                 //Remover os mortos da lista pop
                 foreach (Pessoa morto in mortos)
